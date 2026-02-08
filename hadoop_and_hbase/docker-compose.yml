@@ -1,0 +1,30 @@
+services:
+  hadoop-hbase:
+    build: .
+    container_name: hadoop-hbase
+    hostname: hadoop-hbase
+    ports:
+      - "9870:9870"    # Hadoop NameNode Web UI
+      - "8088:8088"    # Hadoop ResourceManager Web UI
+      - "19888:19888"  # Hadoop HistoryServer
+      - "16010:16010"  # HBase Master Web UI
+      - "16030:16030"  # HBase RegionServer Web UI
+      - "2181:2181"    # ZooKeeper
+      - "2222:22"      # SSH
+    volumes:
+      - ./data:/data
+      - ./logs:/opt/hadoop/logs
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64
+      - HADOOP_HOME=/opt/hadoop
+      - HBASE_HOME=/opt/hbase
+    privileged: true
+    stdin_open: true
+    tty: true
+    networks:
+      - hadoop-network
+
+networks:
+  hadoop-network:
+    driver: bridge
+    name: hadoop-network
