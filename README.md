@@ -143,6 +143,62 @@ docker-compose -f docker-compose-replica.yml up -d
 
 ## Hadoop & HBase 环境
 
+
+### 拉取 Docker Hub 镜像
+
+本项目构建的 Hadoop & HBase 镜像已上传到 Docker Hub：[hub.docker.com/repository/docker/kisechan/hadoop-hbase](https://hub.docker.com/repository/docker/kisechan/hadoop-hbase/)，可直接拉取和使用。
+
+### 拉取镜像
+
+```bash
+docker pull kisechan/hadoop-hbase:latest
+```
+
+### 使用镜像
+
+您可使用以下 `docker-compose.yml` 文件直接运行从 Docker Hub 拉取的镜像：
+
+```yaml
+version: '3.8'
+services:
+  hadoop-hbase:
+    image: kisechan/hadoop-hbase:latest
+    container_name: hadoop-hbase
+    hostname: hadoop-hbase
+    ports:
+      - "9870:9870"    # Hadoop NameNode Web UI
+      - "8088:8088"    # Hadoop ResourceManager Web UI
+      - "19888:19888"  # Hadoop HistoryServer
+      - "16010:16010"  # HBase Master Web UI
+      - "16030:16030"  # HBase RegionServer Web UI
+      - "2181:2181"    # ZooKeeper
+      - "22:22"        # SSH
+    volumes:
+      - ./data:/data
+      - ./logs:/opt/hadoop/logs
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64
+      - HADOOP_HOME=/opt/hadoop
+      - HBASE_HOME=/opt/hbase
+    privileged: true
+    stdin_open: true
+    tty: true
+    networks:
+      hadoop-network:
+
+networks:
+  hadoop-network:
+    driver: bridge
+```
+
+运行以下命令启动服务：
+
+```bash
+docker-compose up -d
+```
+
+### 本地构建镜像
+
 > [!NOTE]
 > 由于网络问题，直接运行 `docker-compose up` 可能会失败。**建议先手动拉取 Ubuntu 镜像**：
 > 
@@ -152,7 +208,7 @@ docker-compose -f docker-compose-replica.yml up -d
 > 
 > **整个构建过程大约需要 10 分钟**。
 
-### 启动步骤
+#### 启动步骤
 
 ```bash
 # 进入项目目录
@@ -206,7 +262,7 @@ hbase> exit                                     # 退出
 
 ### HBase Java 客户端测试
 
-详细说明请查看 [hbase-test/README.md](hadoop_and_hbase/hbase-test/README.md)
+详细说明和项目代码请查看 [hbase-test/README.md](hadoop_and_hbase/hbase-test/README.md)
 
 ### 停止和清理
 
